@@ -1,5 +1,5 @@
 import Card from '@components/Card'
-import { examples } from "@/data/crud";
+import { crud, examples } from "@/data/crud";
 import styles from './page.module.css';
 
 
@@ -9,6 +9,17 @@ export default async function Page() {
     return (
         <>
             <main className={styles.main}>
+                {crud.map(({ id, method, verb, description, color, Icon }) => (
+                    <Card
+                        key={id}
+                        id={id}
+                        verb={verb}
+                        method={method}
+                        description={description}
+                        color={color}
+                        Icon={Icon}
+                    />
+                ))}
                 {examples.map(({ id, method, verb, description, color, Icon }) => (
                     <Card
                         key={id}
