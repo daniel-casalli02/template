@@ -9,7 +9,7 @@ export default async function Page() {
     return (
         <>
             <main className={styles.main}>
-                {crud.map(({ id, method, verb, description, color, Icon }) => (
+                {examples.map(({ id, method, verb, description, color, Icon }) => (
                     <Card
                         key={id}
                         id={id}
@@ -20,7 +20,7 @@ export default async function Page() {
                         Icon={Icon}
                     />
                 ))}
-                {examples.map(({ id, method, verb, description, color, Icon }) => (
+                {crud.map(({ id, method, verb, description, color, Icon }) => (
                     <Card
                         key={id}
                         id={id}
