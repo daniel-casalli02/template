@@ -1,12 +1,11 @@
 'use client';
-
 import FormModal from '@components/FormModal';
+import ConfirmDelete from '@components/ConfirmDelete';
 import { Button, Card, Form, Skeleton } from 'antd';
 import axios from 'axios';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-
 export default function ReadByIdPage() {
     const { id } = useParams();
     const [serie, setSerie] = useState(null);
@@ -15,7 +14,6 @@ export default function ReadByIdPage() {
     const [deleteOpen, setDeleteOpen] = useState(false);
     const [saving, setSaving] = useState(false);
     const [deleting, setDeleting] = useState(false);
-
     useEffect(() => {
         async function buscarSerie() {
             try {
@@ -28,32 +26,41 @@ export default function ReadByIdPage() {
                 setLoading(false);
             }
         }
-
         buscarSerie();
     }, [id]);
-
-    async function handleUpdate(values) {
+    const handleUpdate = async (values) => {
         setSaving(true);
-
         try {
-            const response = await axios.put(`/api/series/${id}`, values);
-            setSerie(response.data);
+            await axios.put(`/api/series/${id}`, values);
+            setSerie({ ...serie, ...values });
             setEditOpen(false);
-            toast.success('Série atualizada.', { id: 'read-id' });
+            toast.success("Série atualizada com sucesso!", { id: "update-success" })
         } catch (error) {
-            toast.error('Erro ao atualizar série.', { id: 'read-id' });
+            toast.error('Erro ao aualizar a série.', { id: "update-error" });
             console.error(error);
         } finally {
             setSaving(false);
         }
-    }
-
+    };
+    const handleDelete = async () => {
+        setDeleting(true);
+        try {
+            await axios.delete(`/api/series/${id}`);
+            setSerie(null);
+            setDeleteOpen(false);
+            toast.success("Série excluída com sucesso!", { id: "delete-success" });
+        } catch (error) {
+            toast.error('Erro ao excluir a série.', { id: "delete-error" });
+            console.error(error);
+        } finally {
+            setDeleting(false);
+        }
+    };
     return (
         <main>
-            <h2>Get By Id - read</h2>
+            <h2>Get By Id - read{serie &&` - ${serie.title}`} </h2>
             <p>O navegador busca, edita e exclui pelo /api/series/[id] (nosso route.js); o servidor fala com a API usando a api-key privada.</p>
             <p>Abra o DevTools - Network: aparece a série (GET/PUT/DELETE), sem x-api-key.</p>
-
             {loading ? (
                 <div className="skeleton">
                     <Skeleton active />
@@ -67,7 +74,6 @@ export default function ReadByIdPage() {
                             <p>Temporadas: {serie.numero_temporadas}</p>
                             <p>Ano do lançamento: {serie.ano_lancamento}</p>
                         </Card>
-
                         <div className="actions">
                             <Button type="primary" onClick={() => setEditOpen(true)}>
                                 Editar
@@ -76,13 +82,19 @@ export default function ReadByIdPage() {
                                 Excluir
                             </Button>
                         </div>
-
                         <FormModal
                             openModal={editOpen}
                             serie={serie}
                             confirmLoading={saving}
                             onSubmit={handleUpdate}
                             onCancel={() => setEditOpen(false)}
+                        />
+                        <ConfirmDelete
+                            openModal={deleteOpen}
+                            serie={serie}
+                            confirmLoading={deleting}
+                            onConfirm={handleDelete}
+                            onCancel={() => setDeleteOpen(false)}
                         />
                     </>
                 )
